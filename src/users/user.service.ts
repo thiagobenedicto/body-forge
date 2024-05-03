@@ -14,6 +14,14 @@ export class UserService {
     });
   }
 
+  async userByEmail(email: string) {
+    return this.prisma.users.findFirst({
+      where: {
+        login: email
+      },
+    });
+  }
+
   async users(params: { // pelo que eu entendi ele vai retornar um array de usuários com algumas opções de paginação (perguntar sobre paginação burrokkkkk)
     skip?: number;
     take?: number;
