@@ -5,7 +5,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async user(usersWhereUniqueInput: Prisma.UsersWhereUniqueInput // tentar explicar pq não entendi direito (eu acho kkkk)
   ): Promise<User | null> {

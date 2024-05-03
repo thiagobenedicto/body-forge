@@ -1,11 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, ValidationPipe } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { CreateUserDTO } from "./dto/create-user.dto";
 import { UpdateUserDTO } from "./dto/update-user.dto";
 
 @Controller('users')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService) { }
 
   @Post()
   async createUser(@Body(new ValidationPipe()) userPayload: CreateUserDTO) {

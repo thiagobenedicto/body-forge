@@ -1,17 +1,18 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, ValidationPipe } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, ValidationPipe } from "@nestjs/common";
 import { ExercisesService } from "./exercises.service";
 import { CreateExerciseDTO } from "./dto/create-exercise.dto";
 import { UpdateExerciseDTO } from "./dto/update-exercise.dto";
 
+
 @Controller('exercises')
 export class ExercisesController {
-  constructor(private exercisesService: ExercisesService) {}
+  constructor(private exercisesService: ExercisesService) { }
 
   @Post()
   async createExercise(@Body(new ValidationPipe()) exercisePayload: CreateExerciseDTO) {
     return this.exercisesService.createExercise(exercisePayload)
   }
-  
+
   @Get()
   async getAllExercises() {
     return this.exercisesService.exercises({});
