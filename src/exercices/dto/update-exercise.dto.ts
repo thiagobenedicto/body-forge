@@ -12,6 +12,5 @@ export class UpdateExerciseDTO {
 
   @IsOptional()
   @IsNotEmpty({ message: 'Property muscle_group cannot be empty'})
-  @IsEnum(MuscleGroup)
-  muscle_group: MuscleGroup
+  muscle_group: string
 }

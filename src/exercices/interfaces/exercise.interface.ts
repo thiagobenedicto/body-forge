@@ -11,5 +11,5 @@ export enum MuscleGroup {
 export interface Exercise {
   id: number,
   name: string,
-  muscle_group: MuscleGroup,
+  muscleGroup: string,
 }

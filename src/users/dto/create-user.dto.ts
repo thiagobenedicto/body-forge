@@ -1,10 +1,6 @@
 import { IsNotEmpty, IsNumber, IsString, MinLength } from "class-validator";
 
 export class CreateUserDTO {
-  @IsNotEmpty({ message: 'Property id cannot be empty' })
-  @IsNumber()
-  id: number;
-
   @IsNotEmpty({ message: 'Property name cannot be empty' })
   @IsString()
   name: string;

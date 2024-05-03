@@ -1,30 +1,29 @@
 import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
+import { CreateWorkoutDTO } from "./dto/create-workout.dto";
+import { UpdateWorkoutDTO } from "./dto/update-workout.dto";
+import { WorkoutService } from "./workout.service";
 
 @Controller('workout')
 export class WorkoutController {
+  constructor (private workoutService: WorkoutService) {}
+
   @Post()
-  async createWorkout(@Body() workoutPayload: any) { // Fix using DTO
-    return 'This action adds a new workout'
+  async createWorkout(@Body() workoutPayload: CreateWorkoutDTO) {
+    return this.workoutService.createWorkout(workoutPayload);
   }
 
   @Get()
   async getAllWorkouts() {
-    return 'This returns all workouts'
+    return this.workoutService.workouts({});
   }
 
   @Get(':id')
   async getOneWorkout(@Param('id') id: string) {
-    console.log(id);
-    return `returns #${id} workout`
+    return this.workoutService.workout({ id: Number(id) });
   }
 
   @Put(':id')
-  async updateWorkout(@Param('id') id: string, @Body() workoutPayload: any) { // Fix with DTO
-    return `this updates #${id} workout`
-  }
-
-  @Delete(':id')
-  async deleteWorkout(@Param('id') id: string) {
-    return `this deletes #${id} workout`
+  async updateWorkout(@Param('id') id: string, @Body() workoutPayload: UpdateWorkoutDTO) {
+    return this.workoutService.updateWorkout({ where: { id: Number(id) }, data: workoutPayload });
   }
 }

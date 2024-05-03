@@ -1,29 +1,56 @@
 import { Injectable } from "@nestjs/common";
 import { Workout } from "./interfaces/workout.interface";
+import { Prisma } from "@prisma/client";
+import { PrismaService } from "src/prisma/prisma.service";
 
 @Injectable()
 export class WorkoutService {
-  private readonly workouts: Workout[] = []
+  constructor(private prisma: PrismaService) {}
 
-  create(workout: Workout) {  
-    this.workouts.push(workout)
+  async workout(workoutsWhereUniqueInput: Prisma.WorkoutsWhereUniqueInput
+  ): Promise<Workout | null> {
+    return this.prisma.workouts.findUnique({
+      where: workoutsWhereUniqueInput,
+    });
   }
 
-  findAll(): Workout[] {
-    return this.workouts
+  async workouts(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.WorkoutsWhereUniqueInput;
+    where?: Prisma.WorkoutsWhereInput;
+    orderBy?: Prisma.WorkoutsOrderByWithRelationInput;
+  }): Promise<Workout[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.workouts.findMany({
+      skip,
+      take,
+      cursor,
+      where,
+      orderBy,
+    });
   }
 
-  findOne(id: number): Workout {
-    return this.workouts.find(workout => workout.id === id)
+  async createWorkout(data: Prisma.WorkoutsCreateInput): Promise<Workout> {
+    return this.prisma.workouts.create({
+      data,
+    });
   }
 
-  update(id: number, workoutPayload: Workout) {
-    const index = this.workouts.findIndex(workout => workout.id === id)
-    this.workouts[index] = workoutPayload
+  async updateWorkout(params: {
+    where: Prisma.WorkoutsWhereUniqueInput;
+    data: Prisma.WorkoutsUpdateInput;
+  }): Promise<Workout> {
+    const { data, where } = params;
+    return this.prisma.workouts.update({
+      data,
+      where,
+    });
   }
 
-  remove(id: number) {
-    const index = this.workouts.findIndex(workout => workout.id === id)
-    this.workouts.splice(index, 1)
+  async deleteWorkout(where: Prisma.WorkoutsWhereUniqueInput): Promise<Workout> {
+    return this.prisma.workouts.delete({
+      where,
+    });
   }
 }

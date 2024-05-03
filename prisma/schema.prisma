@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id       Int    @id @default(autoincrement())
+  name     String
+  login    String
+  password String
+}
+
+model Exercises {
+  id                Int                 @id @default(autoincrement())
+  name              String
+  muscleGroup       String              @map("muscle_group") // não encontrei uma forma simples de utilizar o ENUM nesse caso
+  workout_exercises Workout_Exercises[]
+}
+
+model Workouts {
+  id                Int                 @id @default(autoincrement())
+  user_id           Int
+  name              String
+  description       String
+  workout_exercises Workout_Exercises[]
+}
+
+model Workout_Exercises {
+  id          Int       @id @default(autoincrement())
+  date        DateTime
+  workout     Workouts  @relation(fields: [workout_id], references: [id])
+  workout_id  Int
+  exercise    Exercises @relation(fields: [exercise_id], references: [id])
+  exercise_id Int
+  sets        Int
+  reps        Int
+  weight      Int
+}

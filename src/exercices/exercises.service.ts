@@ -1,29 +1,56 @@
 import { Injectable } from '@nestjs/common';
 import { Exercise } from './interfaces/exercise.interface';
+import { Prisma } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ExercisesService {
-  private readonly exercises: Exercise[] = []
+  constructor (private prisma: PrismaService) {}
 
-  async create(exercise: Exercise) {
-    this.exercises.push(exercise)
+  async exercise(exercisesWhereUniqueInput: Prisma.ExercisesWhereUniqueInput
+  ): Promise<Exercise | null> {
+    return this.prisma.exercises.findUnique({ // não encontrei uma forma de fazer o ENUM T.T
+      where: exercisesWhereUniqueInput,
+    });
   }
 
-  findAll(): Exercise[] {
-    return this.exercises
+  async exercises(params: {
+    skip?: number;
+    take?: number;
+    cursor?: Prisma.ExercisesWhereUniqueInput;
+    where?: Prisma.ExercisesWhereInput;
+    orderBy?: Prisma.ExercisesOrderByWithRelationInput;
+  }): Promise<Exercise[]> {
+    const { skip, take, cursor, where, orderBy } = params;
+    return this.prisma.exercises.findMany({
+      skip,
+      take,
+      cursor,
+      where,
+      orderBy,
+    });
   }
 
-  findOne(id: number): Exercise { 
-    return this.exercises.find(exercise => exercise.id === Number(id))
+  async createExercise(data: Prisma.ExercisesCreateInput): Promise<Exercise> {
+    return this.prisma.exercises.create({
+      data,
+    });
   }
 
-  update(id: number, exercisePayload: Exercise) {
-    const index = this.exercises.findIndex(exercisePayload => exercisePayload.id === id)
-    this.exercises[index] = exercisePayload
+  async updateExercise(params: {
+    where: Prisma.ExercisesWhereUniqueInput;
+    data: Prisma.ExercisesUpdateInput;
+  }): Promise<Exercise> {
+    const { data, where } = params;
+    return this.prisma.exercises.update({
+      data,
+      where,
+    });
   }
 
-  remove(id: number) {
-    const index = this.exercises.findIndex(exercise => exercise.id === id)
-    this.exercises.splice(index, 1)
+  async deleteExercise(where: Prisma.ExercisesWhereUniqueInput): Promise<Exercise> {
+    return this.prisma.exercises.delete({
+      where,
+    });
   }
 }
