@@ -10,7 +10,7 @@ export class AuthController {
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  async login(@Request() req: any) {
+  async login(@Request() req: any) { // De novo, aqui é o req, não entendi oq teria dentro dele
     return this.authService.login(req.user);
   }
 }
