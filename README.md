@@ -20,9 +20,9 @@ Você precisará configurar algumas variáveis de ambiente para o funcionamento 
 2. Preencha as variáveis no arquivo `.env` com as informações necessárias:
 
 ```
-DATABASE_URL="postgresql://{usuário}:{senha}@localhost:5432/db"
 POSTGRES_USER={usuário}
 POSTGRES_PASSWORD={senha}
+DATABASE_URL=postgresql://{usuário}:{senha}@localhost:5432/db
 ```
 
 ## Banco de Dados :computer:
