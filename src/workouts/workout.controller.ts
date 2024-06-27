@@ -5,7 +5,6 @@ import {
   Param,
   Post,
   Put,
-  ValidationPipe,
 } from '@nestjs/common';
 import { CreateWorkoutDTO } from './dto/create-workout.dto';
 import { UpdateWorkoutDTO } from './dto/update-workout.dto';
@@ -17,7 +16,7 @@ export class WorkoutController {
 
   @Post()
   async createWorkout(
-    @Body(new ValidationPipe()) workoutPayload: CreateWorkoutDTO,
+    @Body() workoutPayload: CreateWorkoutDTO,
   ) {
     return this.workoutService.createWorkout(workoutPayload);
   }
@@ -35,7 +34,7 @@ export class WorkoutController {
   @Put(':id')
   async updateWorkout(
     @Param('id') id: string,
-    @Body(new ValidationPipe()) workoutPayload: UpdateWorkoutDTO,
+    @Body() workoutPayload: UpdateWorkoutDTO,
   ) {
     return this.workoutService.updateWorkout({
       where: { id: Number(id) },

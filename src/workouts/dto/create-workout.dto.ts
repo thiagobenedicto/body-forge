@@ -1,18 +1,14 @@
-import { IsNotEmpty, IsString } from "class-validator"
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateWorkoutDTO {
   @IsNotEmpty({ message: 'Property user cannot be empty' })
-  user: {
-    connect: {
-      id: number
-    }
-  }
+  userId: number;
 
   @IsNotEmpty({ message: 'Property name cannot be empty' })
   @IsString()
-  name: string
+  name: string;
 
   @IsNotEmpty({ message: 'Property description cannot be empty' })
   @IsString()
-  description: string
+  description: string;
 }

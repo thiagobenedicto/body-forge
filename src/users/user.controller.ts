@@ -5,7 +5,6 @@ import {
   Param,
   Post,
   Put,
-  ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDTO } from './dto/create-user.dto';
@@ -16,7 +15,7 @@ export class UserController {
   constructor(private userService: UserService) { }
 
   @Post()
-  async createUser(@Body(new ValidationPipe()) userPayload: CreateUserDTO) {
+  async createUser(@Body() userPayload: CreateUserDTO) {
     return this.userService.createUser(userPayload);
   }
 
@@ -33,7 +32,7 @@ export class UserController {
   @Put(':id')
   async updateUser(
     @Param('id') id: string,
-    @Body(new ValidationPipe()) userPayload: UpdateUserDTO,
+    @Body() userPayload: UpdateUserDTO,
   ) {
     return this.userService.updateUser({
       where: { id: Number(id) },
