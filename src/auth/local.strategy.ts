@@ -1,8 +1,7 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { PassportStrategy } from "@nestjs/passport";
-import { Strategy } from "passport-local";
-import { AuthService } from "./auth.service";
-import { User } from "src/users/interfaces/user.interface";
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { PassportStrategy } from '@nestjs/passport';
+import { Strategy } from 'passport-local';
+import { AuthService } from './auth.service';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
@@ -10,7 +9,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     super({ usernameField: 'login' });
   }
 
-  async validate(login: string, password: string): Promise<Response | any> {// COMO FAZER A TIPAGEM DO UnauthorizedException
+  async validate(login: string, password: string): Promise<Response | any> {
     const response = await this.authService.validateUser(login, password);
     if (!response) {
       throw new UnauthorizedException();

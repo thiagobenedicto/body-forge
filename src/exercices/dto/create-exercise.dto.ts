@@ -1,10 +1,9 @@
-import { IsEnum, IsNotEmpty, IsNumber } from "class-validator"
-import { MuscleGroup } from "../interfaces/exercise.interface"
+import { IsNotEmpty } from 'class-validator';
 
 export class CreateExerciseDTO {
   @IsNotEmpty()
-  name: string
+  name: string;
 
   @IsNotEmpty()
-  muscleGroup: string
+  muscleGroup: string;
 }

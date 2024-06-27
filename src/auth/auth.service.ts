@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Response, User } from 'src/users/interfaces/user.interface';
+import { Response } from 'src/users/interfaces/user.interface';
 import { UserService } from 'src/users/user.service';
 import * as bcrypt from 'bcrypt';
 
@@ -8,26 +8,32 @@ import * as bcrypt from 'bcrypt';
 export class AuthService {
   constructor(
     private userService: UserService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ) { }
 
-  async validateUser(login: string, password: string): Promise<Response | null> {
-    const user = await this.userService.userByEmail(login)
-    const verifyPassword = async (password: string, hash: string): Promise<boolean> => {
+  async validateUser(
+    login: string,
+    password: string,
+  ): Promise<Response | null> {
+    const user = await this.userService.userByEmail(login);
+    const verifyPassword = async (
+      password: string,
+      hash: string,
+    ): Promise<boolean> => {
       return await bcrypt.compare(password, hash);
-    }
+    };
 
-    if (user && await verifyPassword(password, user.password)) {
-      const { password, ...response } = user
-      return response
+    if (user && (await verifyPassword(password, user.password))) {
+      const { password, ...response } = user;
+      return response;
     }
-    return null
+    return null;
   }
 
-  async login(user: any) {  // AQUI NÃO ENTENDI MUITO BEM O req, NÃO ENTENDI OQ TERIA DENTRO DELE
-    const payload = { login: user.login, sub: user.userId }
+  async login(user: any) {
+    const payload = { login: user.login, sub: user.userId };
     return {
-      access_token: this.jwtService.sign(payload)
-    }
+      access_token: this.jwtService.sign(payload),
+    };
   }
 }
