@@ -7,15 +7,21 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 
 @Module({
-  imports: [ExercisesModule, UserModule, WorkoutModule, AuthModule, ConfigModule.forRoot({
-    isGlobal: true,
-  })],
+  imports: [
+    ExercisesModule,
+    UserModule,
+    WorkoutModule,
+    AuthModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+  ],
   controllers: [],
   providers: [
     {
       provide: 'APP_GUARD',
-      useClass: JwtAuthGuard
-    }
+      useClass: JwtAuthGuard,
+    },
   ],
 })
-export class AppModule { }
+export class AppModule {}

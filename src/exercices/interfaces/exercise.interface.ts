@@ -5,11 +5,11 @@ export enum MuscleGroup {
   chest,
   back,
   legs,
-  abs
+  abs,
 }
 
 export interface Exercise {
-  id: number,
-  name: string,
-  muscleGroup: string,
+  id: number;
+  name: string;
+  muscleGroup: string;
 }

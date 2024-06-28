@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString, MinLength } from "class-validator";
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 export class UpdateUserDTO {
   @IsNotEmpty({ message: 'Property id cannot be empty' })

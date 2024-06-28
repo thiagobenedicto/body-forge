@@ -1,13 +1,14 @@
-import { Injectable } from "@nestjs/common";
-import { Workout } from "./interfaces/workout.interface";
-import { Prisma } from "@prisma/client";
-import { PrismaService } from "src/prisma/prisma.service";
+import { Injectable } from '@nestjs/common';
+import { Workout } from './interfaces/workout.interface';
+import { Prisma } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class WorkoutService {
   constructor(private prisma: PrismaService) {}
 
-  async workout(workoutsWhereUniqueInput: Prisma.WorkoutsWhereUniqueInput
+  async workout(
+    workoutsWhereUniqueInput: Prisma.WorkoutsWhereUniqueInput,
   ): Promise<Workout | null> {
     return this.prisma.workouts.findUnique({
       where: workoutsWhereUniqueInput,
@@ -31,7 +32,9 @@ export class WorkoutService {
     });
   }
 
-  async createWorkout(data: Prisma.WorkoutsCreateInput): Promise<Workout> {
+  async createWorkout(
+    data: Prisma.WorkoutsUncheckedCreateInput,
+  ): Promise<Workout> {
     return this.prisma.workouts.create({
       data,
     });
@@ -48,7 +51,9 @@ export class WorkoutService {
     });
   }
 
-  async deleteWorkout(where: Prisma.WorkoutsWhereUniqueInput): Promise<Workout> {
+  async deleteWorkout(
+    where: Prisma.WorkoutsWhereUniqueInput,
+  ): Promise<Workout> {
     return this.prisma.workouts.delete({
       where,
     });
