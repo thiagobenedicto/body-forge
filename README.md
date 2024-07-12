@@ -23,6 +23,9 @@ Você precisará configurar algumas variáveis de ambiente para o funcionamento 
 POSTGRES_USER={usuário}
 POSTGRES_PASSWORD={senha}
 DATABASE_URL=postgresql://{usuário}:{senha}@localhost:5432/db
+
+# Master User
+MASTER_PASSWORD={senha_usuario}
 ```
 
 ## Banco de Dados :computer:
