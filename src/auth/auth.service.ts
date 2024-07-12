@@ -1,37 +1,49 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Response } from 'src/users/interfaces/user.interface';
+import { ValidatedUser } from 'src/users/interfaces/user.interface';
 import { UserService } from 'src/users/user.service';
 import * as bcrypt from 'bcrypt';
+import { LoginDTO } from './dto/login.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
+    private prisma: PrismaService,
   ) { }
 
   async validateUser(
     login: string,
     password: string,
-  ): Promise<Response | null> {
+  ): Promise<ValidatedUser> {
     const user = await this.userService.userByEmail(login);
-    const verifyPassword = async (
-      password: string,
-      hash: string,
-    ): Promise<boolean> => {
-      return await bcrypt.compare(password, hash);
-    };
+    if (user && (await bcrypt.compare(password, user.password))) {
+      const { id, name, login } = user;
 
-    if (user && (await verifyPassword(password, user.password))) {
-      const { password, ...response } = user;
-      return response;
+      const validatedUser = {
+        id,
+        name,
+        login,
+      }
+
+      return validatedUser;
     }
-    return null;
+    throw new UnauthorizedException();
   }
 
-  async login(user: any) {
-    const payload = { login: user.login, sub: user.userId };
+
+
+  async login(loginPayload: LoginDTO) {
+
+    const user = await this.prisma.users.findFirst({
+      where: {
+        login: loginPayload.login,
+      }
+    })
+
+    const payload = { login: loginPayload.login, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
     };
