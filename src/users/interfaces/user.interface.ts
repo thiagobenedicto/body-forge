@@ -2,10 +2,12 @@ export interface User {
   id: number;
   name: string;
   login: string;
-  password: string;
+  password?: string;
 }
 
-export interface Response {
+export interface UserWithoutPassword extends Omit<User, 'password'> { }
+
+export interface ValidatedUser {
   id: number;
   name: string;
   login: string;

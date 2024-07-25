@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ValidatedUser } from 'src/users/interfaces/user.interface';
 import { UserService } from 'src/users/user.service';
@@ -14,36 +14,26 @@ export class AuthService {
     private prisma: PrismaService,
   ) { }
 
-  async validateUser(
-    login: string,
-    password: string,
-  ): Promise<ValidatedUser> {
-    const user = await this.userService.userByEmail(login);
-    if (user && (await bcrypt.compare(password, user.password))) {
-      const { id, name, login } = user;
+  async validateUser(loginPayload: LoginDTO): Promise<ValidatedUser> {
+    const user = await this.userService.userByEmail(loginPayload.login);
 
-      const validatedUser = {
-        id,
-        name,
-        login,
-      }
+    if (!user) throw new NotFoundException('User not found');
+    if (!await bcrypt.compare(loginPayload.password, user.password)) throw new UnauthorizedException();
 
-      return validatedUser;
+    const { id, name, login } = user;
+
+    const validatedUser = {
+      id,
+      name,
+      login,
     }
-    throw new UnauthorizedException();
+
+    return validatedUser;
   }
 
-
-
   async login(loginPayload: LoginDTO) {
-
-    const user = await this.prisma.users.findFirst({
-      where: {
-        login: loginPayload.login,
-      }
-    })
-
-    const payload = { login: loginPayload.login, sub: user.id };
+    const user = await this.validateUser(loginPayload);
+    const payload = { login: user.login, sub: user.id };
     return {
       access_token: this.jwtService.sign(payload),
     };

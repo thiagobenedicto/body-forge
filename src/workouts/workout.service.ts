@@ -5,7 +5,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class WorkoutService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
   async workout(
     workoutsWhereUniqueInput: Prisma.WorkoutsWhereUniqueInput,
@@ -33,10 +33,14 @@ export class WorkoutService {
   }
 
   async createWorkout(
-    data: Prisma.WorkoutsUncheckedCreateInput,
+    body: Prisma.WorkoutsUncheckedCreateInput,
+    userId: number,
   ): Promise<Workout> {
     return this.prisma.workouts.create({
-      data,
+      data: {
+        ...body,
+        userId,
+      },
     });
   }
 

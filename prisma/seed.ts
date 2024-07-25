@@ -6,15 +6,20 @@ async function main() {
   const salt = bcrypt.genSaltSync(saltRounds);
   const hash = bcrypt.hashSync(process.env.MASTER_PASSWORD, salt);
 
-  const user = await prisma.users.create(
-    {
-      data: {
-        name: "Thiago Benelirius",
-        login: "thiago.ava@gmail.com",
-        password: hash
-      }
+  const user = {
+    name: "Thiago Benelirius",
+    login: "thiago.ava@gmail.com",
+    password: hash,
+    isAdmin: true
+  }
+
+  await prisma.users.upsert({
+    create: user,
+    update: user,
+    where: {
+      login: user.login
     }
-  )
+  })
 }
 main()
   .then(async () => {
