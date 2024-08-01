@@ -94,25 +94,27 @@ export class WorkoutService {
 
     const whereCondition = user.isAdmin ? { id: workoutId } : { id: workoutId, AND: { userId: user.sub } };
 
+    let deleteMany;
+    if (updateData.workoutExercisesToDelete) {
+      deleteMany = {
+        workoutId,
+        id: { in: updateData.workoutExercisesToDelete }
+      }
+    }
+
     const updatedWorkout = await this.prisma.workouts.update({
       where: whereCondition,
       data: {
         name: updateData.name,
         description: updateData.description,
         workoutExercises: {
-          deleteMany: {
-            workoutId: workoutId,
-          },
-          createMany: {
-            data: updateData.workoutExercises.map(workoutExercise => ({ // HELP
-              exerciseId: workoutExercise.exerciseId,
-              sets: workoutExercise.sets,
-              reps: workoutExercise.reps,
-              weight: workoutExercise.weight,
-              weekDay: workoutExercise.weekDay,
-            })),
-          },
-        },
+          deleteMany,
+          upsert: updateData.workoutExercisesToUpsert?.map(({ id, exerciseId, reps, sets, weight }) => ({
+            update: { exerciseId, reps, sets, weight },
+            create: { exerciseId, reps, sets, weight },
+            where: { id: id || 0 }
+          }))
+        }
       },
     });
 

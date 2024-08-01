@@ -2,7 +2,7 @@ import { WeekDay } from '@prisma/client';
 import { Type } from 'class-transformer';
 import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsString, ValidateNested } from 'class-validator';
 
-class CreateWorkoutExerciseDTO {
+export class CreateWorkoutExerciseDTO {
   @IsNotEmpty({ message: 'Property exerciseId cannot be empty' })
   @IsNumber()
   exerciseId: number;
