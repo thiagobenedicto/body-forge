@@ -5,8 +5,6 @@ export interface User {
   password?: string;
 }
 
-export interface UserWithoutPassword extends Omit<User, 'password'> { }
-
 export interface ValidatedUser {
   id: number;
   isAdmin: boolean;

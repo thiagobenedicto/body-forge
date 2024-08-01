@@ -42,7 +42,6 @@ export class UserService {
         id: true,
         name: true,
         login: true,
-        password: false,
       }
     });
   }
