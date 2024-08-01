@@ -53,7 +53,12 @@ export class UserService {
     const hash = bcrypt.hashSync(data.password, salt);
     data.password = hash;
     return this.prisma.users.create({
-      data,
+      data: data,
+      select: {
+        id: true,
+        name: true,
+        login: true,
+      },
     });
   }
 

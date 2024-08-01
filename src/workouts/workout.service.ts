@@ -2,20 +2,27 @@ import { Injectable } from '@nestjs/common';
 import { Workout } from './interfaces/workout.interface';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateWorkoutDTO } from './dto/create-workout.dto';
+import { UpdateWorkoutDTO } from './dto/update-workout.dto';
+import { JwtPayload } from 'src/auth/interface/auth.interface';
 
 @Injectable()
 export class WorkoutService {
   constructor(private prisma: PrismaService) { }
 
-  async workout(
-    workoutsWhereUniqueInput: Prisma.WorkoutsWhereUniqueInput,
+  async getWorkout(
+    workoutId: number,
+    user: JwtPayload
   ): Promise<Workout | null> {
+
+    const whereCondition = user.isAdmin ? { id: workoutId } : { id: workoutId, AND: { userId: user.sub } };
+
     return this.prisma.workouts.findUnique({
-      where: workoutsWhereUniqueInput,
+      where: whereCondition,
     });
   }
 
-  async workouts(params: {
+  async listWorkouts(params: {
     skip?: number;
     take?: number;
     cursor?: Prisma.WorkoutsWhereUniqueInput;
@@ -29,37 +36,96 @@ export class WorkoutService {
       cursor,
       where,
       orderBy,
-    });
-  }
-
-  async createWorkout(
-    body: Prisma.WorkoutsUncheckedCreateInput,
-    userId: number,
-  ): Promise<Workout> {
-    return this.prisma.workouts.create({
-      data: {
-        ...body,
-        userId,
+      select: {
+        id: true,
+        userId: true,
+        name: true,
+        description: true,
+        weekDay: true,
+        workoutExercises: {
+          select: {
+            id: true,
+            reps: true,
+            sets: true,
+            weight: true,
+            exercise: true,
+          }
+        }
       },
     });
   }
 
-  async updateWorkout(params: {
-    where: Prisma.WorkoutsWhereUniqueInput;
-    data: Prisma.WorkoutsUpdateInput;
-  }): Promise<Workout> {
-    const { data, where } = params;
-    return this.prisma.workouts.update({
-      data,
-      where,
+  async createWorkout(
+    body: CreateWorkoutDTO,
+    userId: number,
+  ): Promise<Workout> {
+    const workoutData: Prisma.WorkoutsUncheckedCreateInput = {
+      ...body,
+      userId,
+      workoutExercises: {
+        createMany: {
+          data: body.workoutExercises.map(workoutExercise => ({
+            exerciseId: workoutExercise.exerciseId,
+            sets: workoutExercise.sets,
+            reps: workoutExercise.reps,
+            weight: workoutExercise.weight,
+          }))
+        }
+      }
+    };
+
+    return this.prisma.workouts.create({
+      data: workoutData,
+      include: {
+        workoutExercises: {
+          include: {
+            exercise: true
+          }
+        }
+      }
+    })
+  };
+
+  async updateWorkout(
+    workoutId: number,
+    updateData: UpdateWorkoutDTO,
+    user: JwtPayload
+  ): Promise<Workout> {
+
+    const whereCondition = user.isAdmin ? { id: workoutId } : { id: workoutId, AND: { userId: user.sub } };
+
+    const updatedWorkout = await this.prisma.workouts.update({
+      where: whereCondition,
+      data: {
+        name: updateData.name,
+        description: updateData.description,
+        workoutExercises: {
+          deleteMany: {
+            workoutId: workoutId,
+          },
+          createMany: {
+            data: updateData.workoutExercises.map(workoutExercise => ({ // HELP
+              exerciseId: workoutExercise.exerciseId,
+              sets: workoutExercise.sets,
+              reps: workoutExercise.reps,
+              weight: workoutExercise.weight,
+              weekDay: workoutExercise.weekDay,
+            })),
+          },
+        },
+      },
     });
+
+    return updatedWorkout;
   }
 
   async deleteWorkout(
-    where: Prisma.WorkoutsWhereUniqueInput,
+    workoutId: number,
   ): Promise<Workout> {
     return this.prisma.workouts.delete({
-      where,
+      where: {
+        id: workoutId
+      }
     });
-  }
+  };
 }
