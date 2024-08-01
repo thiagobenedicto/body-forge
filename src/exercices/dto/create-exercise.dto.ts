@@ -1,9 +1,10 @@
-import { IsNotEmpty } from 'class-validator';
+import { MuscleGroup } from '@prisma/client';
+import { IsEnum, IsNotEmpty } from 'class-validator';
 
 export class CreateExerciseDTO {
   @IsNotEmpty()
   name: string;
 
-  @IsNotEmpty()
-  muscleGroup: string;
+  @IsEnum(MuscleGroup)
+  muscleGroup: MuscleGroup;
 }
