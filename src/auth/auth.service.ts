@@ -20,12 +20,12 @@ export class AuthService {
     if (!user) throw new NotFoundException('User not found');
     if (!await bcrypt.compare(loginPayload.password, user.password)) throw new UnauthorizedException();
 
-    const { id, name, login } = user;
+    const { id, isAdmin, login } = user;
 
     const validatedUser = {
       id,
-      name,
       login,
+      isAdmin,
     }
 
     return validatedUser;
@@ -33,7 +33,7 @@ export class AuthService {
 
   async login(loginPayload: LoginDTO) {
     const user = await this.validateUser(loginPayload);
-    const payload = { login: user.login, sub: user.id };
+    const payload = { login: user.login, sub: user.id, isAdmin: user.isAdmin };
     return {
       access_token: this.jwtService.sign(payload),
     };
