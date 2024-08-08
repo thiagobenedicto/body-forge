@@ -1,5 +1,7 @@
 # :muscle: Body Forge :muscle:
 
+Body Forge é uma plataforma de fichas de treino projetada para facilitar a criação e personalização de rotinas de exercícios. Com o Body Forge, os usuários podem escolher entre uma variedade de exercícios e montar suas próprias fichas de treino, adaptadas às suas necessidades e objetivos fitness.
+
 Aqui você encontrará informações importantes sobre como configurar e executar o projeto.
 
 ## Instalação :robot:
