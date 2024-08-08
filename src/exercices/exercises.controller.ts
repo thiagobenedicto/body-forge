@@ -1,16 +1,24 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, ValidationPipe } from "@nestjs/common";
-import { ExercisesService } from "./exercises.service";
-import { CreateExerciseDTO } from "./dto/create-exercise.dto";
-import { UpdateExerciseDTO } from "./dto/update-exercise.dto";
-
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
+import { ExercisesService } from './exercises.service';
+import { CreateExerciseDTO } from './dto/create-exercise.dto';
+import { UpdateExerciseDTO } from './dto/update-exercise.dto';
 
 @Controller('exercises')
 export class ExercisesController {
   constructor(private exercisesService: ExercisesService) { }
 
   @Post()
-  async createExercise(@Body(new ValidationPipe()) exercisePayload: CreateExerciseDTO) {
-    return this.exercisesService.createExercise(exercisePayload)
+  async createExercise(
+    @Body() exercisePayload: CreateExerciseDTO,
+  ) {
+    return this.exercisesService.createExercise(exercisePayload);
   }
 
   @Get()
@@ -24,7 +32,13 @@ export class ExercisesController {
   }
 
   @Put(':id')
-  async updateExercise(@Param('id') id: string, @Body(new ValidationPipe()) exercisePayload: UpdateExerciseDTO) {
-    return this.exercisesService.updateExercise({ where: { id: Number(id) }, data: exercisePayload })
+  async updateExercise(
+    @Param('id') id: string,
+    @Body() exercisePayload: UpdateExerciseDTO,
+  ) {
+    return this.exercisesService.updateExercise({
+      where: { id: Number(id) },
+      data: exercisePayload,
+    });
   }
 }

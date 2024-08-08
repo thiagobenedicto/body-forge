@@ -1,22 +1,38 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator"
+import { WeekDay } from '@prisma/client';
+import { PartialType } from '@nestjs/mapped-types';
+import { Type } from 'class-transformer';
+import { IsArray, IsEnum, IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { CreateWorkoutExerciseDTO } from './create-workout.dto';
 
-export class UpdateWorkoutDTO {
+export class UpdateWorkoutExercisesDTO extends PartialType(CreateWorkoutExerciseDTO) {
   @IsNotEmpty({ message: 'Property id cannot be empty' })
   @IsNumber()
-  id: number
+  id: number;
+}
 
-  @IsOptional()
-  @IsNotEmpty({ message: 'Property user_id cannot be empty'})
-  @IsNumber()
-  user_id: number
+export class UpsertWorkoutExercisesDTO extends PartialType(UpdateWorkoutExercisesDTO) { }
 
+export class UpdateWorkoutDTO {
   @IsOptional()
-  @IsNotEmpty({ message: 'Property name cannot be empty' })
   @IsString()
-  name: string
+  name: string;
 
   @IsOptional()
-  @IsNotEmpty({ message: 'Property description cannot be empty' })
   @IsString()
-  description: string
+  description: string;
+
+  @IsOptional()
+  @IsEnum(WeekDay)
+  weekDay: WeekDay;
+
+  @IsOptional()
+  @IsArray()
+  @IsInt({ each: true })
+  workoutExercisesToDelete: number[];
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => UpsertWorkoutExercisesDTO)
+  workoutExercisesToUpsert: UpsertWorkoutExercisesDTO[];
 }

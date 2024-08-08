@@ -1,13 +1,15 @@
-import { Injectable } from "@nestjs/common";
-import { User } from "./interfaces/user.interface";
-import { Prisma } from "@prisma/client";
-import { PrismaService } from "src/prisma/prisma.service";
+import { Injectable } from '@nestjs/common';
+import { User } from './interfaces/user.interface';
+import { Prisma } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
   constructor(private prisma: PrismaService) { }
 
-  async user(usersWhereUniqueInput: Prisma.UsersWhereUniqueInput // tentar explicar pq não entendi direito (eu acho kkkk)
+  async user(
+    usersWhereUniqueInput: Prisma.UsersWhereUniqueInput,
   ): Promise<User | null> {
     return this.prisma.users.findUnique({
       where: usersWhereUniqueInput,
@@ -17,12 +19,12 @@ export class UserService {
   async userByEmail(email: string) {
     return this.prisma.users.findFirst({
       where: {
-        login: email
+        login: email,
       },
     });
   }
 
-  async users(params: { // pelo que eu entendi ele vai retornar um array de usuários com algumas opções de paginação (perguntar sobre paginação burrokkkkk)
+  async users(params: {
     skip?: number;
     take?: number;
     cursor?: Prisma.UsersWhereUniqueInput;
@@ -36,12 +38,26 @@ export class UserService {
       cursor,
       where,
       orderBy,
+      select: {
+        id: true,
+        name: true,
+        login: true,
+      }
     });
   }
 
   async createUser(data: Prisma.UsersCreateInput): Promise<User> {
+    const saltRounds = 10;
+    const salt = bcrypt.genSaltSync(saltRounds);
+    const hash = bcrypt.hashSync(data.password, salt);
+    data.password = hash;
     return this.prisma.users.create({
-      data,
+      data: data,
+      select: {
+        id: true,
+        name: true,
+        login: true,
+      },
     });
   }
 

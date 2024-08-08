@@ -5,11 +5,12 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ExercisesService {
-  constructor (private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
-  async exercise(exercisesWhereUniqueInput: Prisma.ExercisesWhereUniqueInput
+  async exercise(
+    exercisesWhereUniqueInput: Prisma.ExercisesWhereUniqueInput,
   ): Promise<Exercise | null> {
-    return this.prisma.exercises.findUnique({ // não encontrei uma forma de fazer o ENUM T.T
+    return this.prisma.exercises.findUnique({
       where: exercisesWhereUniqueInput,
     });
   }
@@ -48,7 +49,9 @@ export class ExercisesService {
     });
   }
 
-  async deleteExercise(where: Prisma.ExercisesWhereUniqueInput): Promise<Exercise> {
+  async deleteExercise(
+    where: Prisma.ExercisesWhereUniqueInput,
+  ): Promise<Exercise> {
     return this.prisma.exercises.delete({
       where,
     });

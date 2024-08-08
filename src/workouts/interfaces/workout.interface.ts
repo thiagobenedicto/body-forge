@@ -1,6 +1,7 @@
+import { WeekDay } from "@prisma/client";
+
 export interface Workout {
-  id: number
-  user_id: number
-  name: string
-  description: string
+  name: string;
+  description: string;
+  weekDay: WeekDay;
 }

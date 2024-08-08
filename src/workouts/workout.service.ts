@@ -1,20 +1,28 @@
-import { Injectable } from "@nestjs/common";
-import { Workout } from "./interfaces/workout.interface";
-import { Prisma } from "@prisma/client";
-import { PrismaService } from "src/prisma/prisma.service";
+import { Injectable } from '@nestjs/common';
+import { Workout } from './interfaces/workout.interface';
+import { Prisma } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateWorkoutDTO } from './dto/create-workout.dto';
+import { UpdateWorkoutDTO } from './dto/update-workout.dto';
+import { JwtPayload } from 'src/auth/interface/auth.interface';
 
 @Injectable()
 export class WorkoutService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService) { }
 
-  async workout(workoutsWhereUniqueInput: Prisma.WorkoutsWhereUniqueInput
+  async getWorkout(
+    workoutId: number,
+    user: JwtPayload
   ): Promise<Workout | null> {
+
+    const whereCondition = user.isAdmin ? { id: workoutId } : { id: workoutId, AND: { userId: user.sub } };
+
     return this.prisma.workouts.findUnique({
-      where: workoutsWhereUniqueInput,
+      where: whereCondition,
     });
   }
 
-  async workouts(params: {
+  async listWorkouts(params: {
     skip?: number;
     take?: number;
     cursor?: Prisma.WorkoutsWhereUniqueInput;
@@ -28,29 +36,98 @@ export class WorkoutService {
       cursor,
       where,
       orderBy,
+      select: {
+        id: true,
+        userId: true,
+        name: true,
+        description: true,
+        weekDay: true,
+        workoutExercises: {
+          select: {
+            id: true,
+            reps: true,
+            sets: true,
+            weight: true,
+            exercise: true,
+          }
+        }
+      },
     });
   }
 
-  async createWorkout(data: Prisma.WorkoutsCreateInput): Promise<Workout> {
+  async createWorkout(
+    body: CreateWorkoutDTO,
+    userId: number,
+  ): Promise<Workout> {
+    const workoutData: Prisma.WorkoutsUncheckedCreateInput = {
+      ...body,
+      userId,
+      workoutExercises: {
+        createMany: {
+          data: body.workoutExercises.map(workoutExercise => ({
+            exerciseId: workoutExercise.exerciseId,
+            sets: workoutExercise.sets,
+            reps: workoutExercise.reps,
+            weight: workoutExercise.weight,
+          }))
+        }
+      }
+    };
+
     return this.prisma.workouts.create({
-      data,
+      data: workoutData,
+      include: {
+        workoutExercises: {
+          include: {
+            exercise: true
+          }
+        }
+      }
+    })
+  };
+
+  async updateWorkout(
+    workoutId: number,
+    updateData: UpdateWorkoutDTO,
+    user: JwtPayload
+  ): Promise<Workout> {
+
+    const whereCondition = user.isAdmin ? { id: workoutId } : { id: workoutId, AND: { userId: user.sub } };
+
+    let deleteMany;
+    if (updateData.workoutExercisesToDelete) {
+      deleteMany = {
+        workoutId,
+        id: { in: updateData.workoutExercisesToDelete }
+      }
+    }
+
+    const updatedWorkout = await this.prisma.workouts.update({
+      where: whereCondition,
+      data: {
+        name: updateData.name,
+        description: updateData.description,
+        workoutExercises: {
+          deleteMany,
+          upsert: updateData.workoutExercisesToUpsert?.map(({ id, exerciseId, reps, sets, weight }) => ({
+            update: { exerciseId, reps, sets, weight },
+            create: { exerciseId, reps, sets, weight },
+            where: { id: id || 0 }
+          }))
+        }
+      },
     });
+
+    return updatedWorkout;
   }
 
-  async updateWorkout(params: {
-    where: Prisma.WorkoutsWhereUniqueInput;
-    data: Prisma.WorkoutsUpdateInput;
-  }): Promise<Workout> {
-    const { data, where } = params;
-    return this.prisma.workouts.update({
-      data,
-      where,
-    });
-  }
-
-  async deleteWorkout(where: Prisma.WorkoutsWhereUniqueInput): Promise<Workout> {
+  async deleteWorkout(
+    workoutId: number,
+  ): Promise<Workout> {
     return this.prisma.workouts.delete({
-      where,
+      where: {
+        id: workoutId
+      }
     });
-  }
+  };
 }
